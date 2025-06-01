@@ -6,7 +6,7 @@ echo '🏗️👷 Styling, testing and building your project before committing'
 # Check staged files
 npx lint-staged ||
 (
-    echo '🤮 Its FOKING RAW - Your styling looks disgusting.
+    echo '🤢🤮🤢🤮 Its FOKING RAW - Your styling looks disgusting. 🤢🤮🤢🤮
             Staged files Check Failed. Run npm run format, add changes and try commit again.';
     false;
 )
@@ -14,7 +14,7 @@ npx lint-staged ||
 # Check Prettier standards
 npm run format ||
 (
-    echo '🤮 Its FOKING RAW - Your styling looks disgusting.
+    echo '🤢🤮🤢🤮 Its FOKING RAW - Your styling looks disgusting. 🤢🤮🤢🤮
             Prettier Check Failed. Run npm run format, add changes and try commit again.';
     false;
 )
@@ -22,7 +22,7 @@ npm run format ||
 # Check ESLint Standards
 npm run lint ||
 (
-        echo '😤 Get that weak shit out of here!
+        echo '😤🏀👋😤 Get that weak shit out of here! 😤🏀👋😤
                 ESLint Check Failed. Make the required changes listed above, add changes and try to commit again.'
         false;
 )
@@ -30,7 +30,7 @@ npm run lint ||
 # Check tsconfig standards
 npm run type-check ||
 (
-    echo '❌ Failed Type check.
+    echo '🤡😂❌🤡 Failed Type check. 🤡😂❌🤡
             Are you seriously trying to write that? Make the changes required above.'
     false;
 )
@@ -44,15 +44,15 @@ npm run type-check ||
 #)
 
 # If everything passes... Now we can build
-echo '🤔... Alright.... Code looks good to me... Trying to build now.'
+echo '🤔🤔🤔🤔... Alright.... Code looks good to me... Trying to build now. 🤔🤔🤔🤔'
 
 npm run build ||
 (
-    echo '❌ Better call Bob... Because your build failed
+    echo '❌👷🔨❌ Better call Bob... Because your build failed ❌👷🔨❌
             Next build failed: View the errors above to see why.
     '
     false;
 )
 
 # If everything passes... Now we can commit
-echo '✅ You win this time... I am committing this now.'
+echo '✅✅✅✅ You win this time... I am committing this now. ✅✅✅✅'
