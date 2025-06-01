@@ -2,6 +2,8 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { Application, NextFunction, Request, Response } from 'express';
 import { CustomError } from './app/interface/error.interface';
+import globalErrorHandler from './app/middlewares/globalErrorHandler';
+import router from './routes';
 
 const app: Application = express();
 
@@ -10,9 +12,14 @@ app.use(express.json());
 app.use(cors());
 app.use(cookieParser());
 
+// application routes
+app.use('/api/', router);
+
 app.get('/', (req, res) => {
   res.send('Working');
 });
+
+app.use(globalErrorHandler);
 
 // Not Found
 app.all('*', (req: Request, res: Response, next: NextFunction) => {
