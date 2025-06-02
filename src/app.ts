@@ -9,7 +9,13 @@ const app: Application = express();
 
 //parsers
 app.use(express.json());
-app.use(cors());
+const corsConfig = {
+  origin: ['http://localhost:5173/', 'http://localhost:3000'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+};
+app.use(cors(corsConfig));
 app.use(cookieParser());
 
 // application routes
