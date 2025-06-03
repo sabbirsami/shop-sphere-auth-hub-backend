@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// app.ts
+
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { Application, NextFunction, Request, Response } from 'express';
@@ -15,15 +15,27 @@ app.use(express.json());
 // Enhanced CORS configuration for subdomains
 const corsConfig = {
   origin: [
+    // Development URLs
     'http://localhost:5173',
     'http://*.localhost:5173',
     'https://localhost:5173',
     'https://*.localhost:5173',
     'http://localhost:3000',
+    // Production URLs
+    'https://shop-sphere-auth-hub.vercel.app',
+    'http://shop-sphere-auth-hub.vercel.app',
+    'http://shop-sphere-auth-hub.vercel.app/',
+    'https://shop-sphere-auth-hub.vercel.app/',
+    'https://*.shop-sphere-auth-hub.vercel.app',
+    'http://*.shop-sphere-auth-hub.vercel.app',
+    'https://*.shop-sphere-auth-hub.vercel.app/',
+    'http://*.shop-sphere-auth-hub.vercel.app/',
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  exposedHeaders: ['Set-Cookie'],
+  maxAge: 86400, // 24 hours in seconds
 };
 
 app.use(cors(corsConfig));
@@ -36,11 +48,11 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     const defaultOptions = {
       domain:
         process.env.NODE_ENV === 'production'
-          ? '.yourdomain.com'
-          : '.localhost',
+          ? 'shop-sphere-auth-hub.vercel.app'
+          : 'localhost',
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     };
     return originalCookie(name, val, { ...defaultOptions, ...options });
   };

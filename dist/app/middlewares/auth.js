@@ -1,4 +1,5 @@
 "use strict";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -20,8 +21,8 @@ const user_model_1 = require("../modules/user/user.model");
 const catchAsync_1 = require("../utils/catchAsync");
 const auth = (...requiredRoles) => {
     return (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-        // Check for token in Authorization header or Bearer format
-        let token = req.headers.authorization;
+        // Check for token in Authorization header or cookies
+        let token = req.headers.authorization || req.cookies.accessToken;
         if (token && token.startsWith('Bearer ')) {
             token = token.slice(7);
         }
@@ -51,8 +52,17 @@ const auth = (...requiredRoles) => {
         if (requiredRoles.length > 0 && !requiredRoles.includes(role)) {
             throw new AppError_1.default(http_status_codes_1.StatusCodes.UNAUTHORIZED, 'You are not authorized!');
         }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // Attach user to request
         req.user = decoded;
+        // If this is a subdomain request, verify the user has access to this shop
+        const hostname = req.hostname;
+        const subdomain = hostname.split('.')[0];
+        if (subdomain && subdomain !== 'localhost' && subdomain !== 'www') {
+            const userShops = user.shops.map((shop) => typeof shop === 'string' ? shop : shop.name);
+            if (!userShops.includes(subdomain)) {
+                throw new AppError_1.default(http_status_codes_1.StatusCodes.FORBIDDEN, 'You do not have access to this shop');
+            }
+        }
         next();
     }));
 };
