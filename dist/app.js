@@ -11,7 +11,13 @@ const routes_1 = __importDefault(require("./routes"));
 const app = (0, express_1.default)();
 //parsers
 app.use(express_1.default.json());
-app.use((0, cors_1.default)());
+const corsConfig = {
+    origin: ['http://localhost:5173/', 'http://localhost:3000'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+};
+app.use((0, cors_1.default)(corsConfig));
 app.use((0, cookie_parser_1.default)());
 // application routes
 app.use('/api/', routes_1.default);

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import jwt, { JwtPayload } from 'jsonwebtoken';
@@ -9,8 +11,8 @@ import { catchAsync } from '../utils/catchAsync';
 
 const auth = (...requiredRoles: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    // Check for token in Authorization header or Bearer format
-    let token = req.headers.authorization;
+    // Check for token in Authorization header or cookies
+    let token = req.headers.authorization || req.cookies.accessToken;
 
     if (token && token.startsWith('Bearer ')) {
       token = token.slice(7);
@@ -59,8 +61,26 @@ const auth = (...requiredRoles: TUserRole[]) => {
       throw new AppError(StatusCodes.UNAUTHORIZED, 'You are not authorized!');
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // Attach user to request
     (req as any).user = decoded as JwtPayload;
+
+    // If this is a subdomain request, verify the user has access to this shop
+    const hostname = req.hostname;
+    const subdomain = hostname.split('.')[0];
+
+    if (subdomain && subdomain !== 'localhost' && subdomain !== 'www') {
+      const userShops = user.shops.map((shop) =>
+        typeof shop === 'string' ? shop : shop.name
+      );
+
+      if (!userShops.includes(subdomain)) {
+        throw new AppError(
+          StatusCodes.FORBIDDEN,
+          'You do not have access to this shop'
+        );
+      }
+    }
+
     next();
   });
 };
