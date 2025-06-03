@@ -13,29 +13,67 @@ const app: Application = express();
 app.use(express.json());
 
 // Enhanced CORS configuration for subdomains
+// const corsConfig = {
+//   origin: [
+//     // Development URLs
+//     'http://localhost:5173',
+//     'http://*.localhost:5173',
+//     'https://localhost:5173',
+//     'https://*.localhost:5173',
+//     'http://localhost:3000',
+//     // Production URLs
+//     'https://shop-sphere-auth-hub.vercel.app',
+//     'http://shop-sphere-auth-hub.vercel.app',
+//     'http://shop-sphere-auth-hub.vercel.app/',
+//     'https://shop-sphere-auth-hub.vercel.app/',
+//     'https://*.shop-sphere-auth-hub.vercel.app',
+//     'http://*.shop-sphere-auth-hub.vercel.app',
+//     'https://*.shop-sphere-auth-hub.vercel.app/',
+//     'http://*.shop-sphere-auth-hub.vercel.app/',
+//   ],
+//   credentials: true,
+//   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+//   allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+// };
 const corsConfig = {
-  origin: [
-    // Development URLs
-    'http://localhost:5173',
-    'http://*.localhost:5173',
-    'https://localhost:5173',
-    'https://*.localhost:5173',
-    'http://localhost:3000',
-    // Production URLs
-    'https://shop-sphere-auth-hub.vercel.app',
-    'http://shop-sphere-auth-hub.vercel.app',
-    'http://shop-sphere-auth-hub.vercel.app/',
-    'https://shop-sphere-auth-hub.vercel.app/',
-    'https://*.shop-sphere-auth-hub.vercel.app',
-    'http://*.shop-sphere-auth-hub.vercel.app',
-    'https://*.shop-sphere-auth-hub.vercel.app/',
-    'http://*.shop-sphere-auth-hub.vercel.app/',
-  ],
+  origin: function (origin: string | undefined, callback: any) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    const allowedOrigins = [
+      // Development URLs
+      'http://localhost:5173',
+      'http://localhost:3000',
+      // Production URLs
+      'https://shop-sphere-auth-hub.vercel.app',
+      'http://shop-sphere-auth-hub.vercel.app',
+    ];
+
+    // Check for exact matches
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    // Check for subdomain patterns
+    const subdomainPatterns = [
+      /^https?:\/\/[\w-]+\.localhost:5173$/,
+      /^https?:\/\/[\w-]+\.shop-sphere-auth-hub\.vercel\.app$/,
+    ];
+
+    const isSubdomainAllowed = subdomainPatterns.some((pattern) =>
+      pattern.test(origin)
+    );
+
+    if (isSubdomainAllowed) {
+      return callback(null, true);
+    }
+
+    // Reject origin
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
-  exposedHeaders: ['Set-Cookie'],
-  maxAge: 86400, // 24 hours in seconds
 };
 
 app.use(cors(corsConfig));
