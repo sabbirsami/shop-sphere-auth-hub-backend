@@ -56,8 +56,13 @@ const auth = (...requiredRoles) => {
         req.user = decoded;
         // If this is a subdomain request, verify the user has access to this shop
         const hostname = req.hostname;
-        const subdomain = hostname.split('.')[0];
-        if (subdomain && subdomain !== 'localhost' && subdomain !== 'www') {
+        const isProduction = process.env.NODE_ENV === 'production';
+        const domain = isProduction
+            ? 'shop-sphere-auth-hub-backend.vercel.app'
+            : 'localhost';
+        // Extract subdomain considering the environment
+        const subdomain = hostname.replace(`.${domain}`, '');
+        if (subdomain && subdomain !== 'www') {
             const userShops = user.shops.map((shop) => typeof shop === 'string' ? shop : shop.name);
             if (!userShops.includes(subdomain)) {
                 throw new AppError_1.default(http_status_codes_1.StatusCodes.FORBIDDEN, 'You do not have access to this shop');
