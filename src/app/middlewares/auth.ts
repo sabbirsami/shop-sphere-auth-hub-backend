@@ -66,9 +66,15 @@ const auth = (...requiredRoles: TUserRole[]) => {
 
     // If this is a subdomain request, verify the user has access to this shop
     const hostname = req.hostname;
-    const subdomain = hostname.split('.')[0];
+    const isProduction = process.env.NODE_ENV === 'production';
+    const domain = isProduction
+      ? 'shop-sphere-auth-hub-backend.vercel.app'
+      : 'localhost';
 
-    if (subdomain && subdomain !== 'localhost' && subdomain !== 'www') {
+    // Extract subdomain considering the environment
+    const subdomain = hostname.replace(`.${domain}`, '');
+
+    if (subdomain && subdomain !== 'www') {
       const userShops = user.shops.map((shop) =>
         typeof shop === 'string' ? shop : shop.name
       );
